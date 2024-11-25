@@ -21,6 +21,24 @@ WANCHAIN="input_wan"
 WANFINALRULE="drop_from_wan"
 DEFAULTCHAIN="input_fwknop"
 
+create_unique_rule() {
+ if ! ( nalc "$DEFAULTCHAIN" | grep "$1" | grep "$2" | grep "$3" > /dev/null); then
+    nir "$DEFAULTCHAIN" ip saddr "$1" "$2" dport "$3" accept
+ fi
+}
+
+ensure_return() {
+  if ! nalc "$DEFAULTCHAIN" | grep "return" > /dev/null; then
+    nir "$DEFAULTCHAIN" return
+  fi
+}
+
+create_fwknop_chain() {
+  if ! nlcs | grep "$DEFAULTCHAIN" > /dev/null; then
+  ncc "$DEFAULTCHAIN" > /dev/null
+  fi
+}
+
 case $1 in
     [0-9]*.[0-9]*.[0-9]*.[0-9]*) IP=$1;;
     *) echo "Invalid IP address $1";;
@@ -38,17 +56,16 @@ esac
 
 # Handle missing chain. New chain will be created with a simple return statement.
 # Additional rules should be inserted 
-if ! nlcs | grep "$DEFAULTCHAIN" > /dev/null; then
-  ncc "$DEFAULTCHAIN"
-  nir "$DEFAULTCHAIN" return
-fi
+
+create_fwknop_chain
+ensure_return
+
 
 # Handle redirect and processing to fwknop chain 
 if ! nlc "$WANCHAIN" | grep "$DEFAULTCHAIN" > /dev/null ; then
   pos=$(nalc "$WANCHAIN" | grep "$WANFINALRULE" | cut -d'#' -f2 | cut -d' ' -f3)
-  echo "insert a jump rule on position $pos"
   nir "$WANCHAIN" position "$pos" jump "$DEFAULTCHAIN"
-  nir "$DEFAULTCHAIN" ip saddr "$IP" "$PROTO" dport "$PORT" accept
+  create_unique_rule "$IP" "$PROTO" "$PORT"
 else
-  nir "$DEFAULTCHAIN" ip saddr "$IP" "$PROTO" dport "$PORT" accept
+  create_unique_rule "$IP" "$PROTO" "$PORT"
 fi

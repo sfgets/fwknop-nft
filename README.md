@@ -59,7 +59,7 @@ config access
         option REQUIRE_SOURCE_ADDRESS 'Y'
         option CMD_CYCLE_OPEN '/etc/fwknop/cmd-open.sh $SRC $PORT $PROTO'
         option CMD_CYCLE_TIMER 5
-        option CMD_CYCLE_CLOSE '/etc/fwknop/cmd-close.sh $SRC $PORT'
+        option CMD_CYCLE_CLOSE '/etc/fwknop/cmd-close.sh $SRC $PORT $PROTO'
 ```
 ## Starting fwknop on the client
 
