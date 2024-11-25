@@ -18,9 +18,8 @@ alias ndr='$n delete rule inet fw4'
 DEFAULTCHAIN="input_fwknop"
 
 handle() {
-    nalc "$DEFAULTCHAIN" | grep "$1" | grep "$2" | grep "$3" | cut -d'#' -f2
+    nalc "$DEFAULTCHAIN" | grep "$1" | grep "$2" | grep "$3" | cut -d'#' -f2 | cut -d' ' -f3 | xargs
 }
-
 case $1 in
     [0-9]*.[0-9]*.[0-9]*.[0-9]*) IP=$1;;
     *) echo "Invalid IP address $1";;
@@ -37,8 +36,11 @@ case $3 in
 esac
 
 hand="$(handle "$IP" "$PORT" "$PROTO")"
-if [ -n "$hand" ]; then
-    ndr "$DEFAULTCHAIN" "$hand"
-else
-    echo "Rule with params: ip::$IP port::$PORT proto::$PROTO Not found"
-fi
+set -- "$hand"
+for i in $*; do
+    if [ "x$i" != "x" ]; then 
+        ndr "$DEFAULTCHAIN" handle "$i"
+    else
+        echo "Rule with params: ip::$IP port::$PORT proto::$PROTO Not found"
+    fi
+done
