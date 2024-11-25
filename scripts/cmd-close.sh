@@ -37,7 +37,7 @@ esac
 
 hand="$(handle "$IP" "$PORT" "$PROTO")"
 set -- "$hand"
-for i in $*; do
+for i in "$@"; do
     if [ "x$i" != "x" ]; then 
         ndr "$DEFAULTCHAIN" handle "$i"
     else
