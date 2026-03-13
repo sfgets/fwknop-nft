@@ -104,7 +104,7 @@ parse_args() {
 
     case "$4" in
         *.*.*.*:*.*.*.*) SRC_IP="${4%:*}" ;;
-        *) log "Invalid src:dst pair: $4"; exit 1 ;;
+        *) SRC_IP="$(echo ${IP%.*}.1)" ;;
     esac
 }
 
