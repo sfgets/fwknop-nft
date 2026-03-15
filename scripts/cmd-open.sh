@@ -125,4 +125,3 @@ main() {
 }
 
 main "$@"
-/etc/fwknop/cmd-open.sh 149.62.208.23/etc/fwknop/cmd-open.sh 149.62.208.236 222 66 222 6
