@@ -25,7 +25,7 @@ log() { echo "$*" >&2; }
 
 get_iface() {
     ip -j a | jq -r --arg v "$1" \
-        '.[] | select(any(.addr_info[]; .local == $v)) | .ifname'
+        '(.[] | select(any(.addr_info[]; .local == $v)) | .ifname) // "wan"'
 }
 
 get_chain() {
@@ -104,7 +104,7 @@ parse_args() {
 
     case "$4" in
         *.*.*.*:*.*.*.*) SRC_IP="${4%:*}" ;;
-        *) SRC_IP="$(echo ${IP%.*}.1)" ;;
+        *) SRC_IP="$IP" ;;
     esac
 }
 
@@ -125,3 +125,4 @@ main() {
 }
 
 main "$@"
+/etc/fwknop/cmd-open.sh 149.62.208.23/etc/fwknop/cmd-open.sh 149.62.208.236 222 66 222 6
